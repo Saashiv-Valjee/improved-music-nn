@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload MIDI File</title>
+    <script type='text/javascript' src='//www.midijs.net/lib/midi.js'></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/images/piano-music-score-music-sheet-keyboard-7eaea38e3708ccf6b296db9e20e38ed7.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #fffef2; /* This will be the fallback color if the image fails to load */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #f7efe0;
+            padding: 50px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        h1, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #2d87f0;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #256bb5;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .midi-selector-row,
+        .midi-control-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .midi-selector-row {
+            margin-bottom: 15px; /* Adds some space between the selector and the controls */
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Upload Your MIDI File</h1>
+    
+        <h3>Select a Model:</h3>
+    
+        <!-- Form for your pretrained model -->
+        <form action="/upload_midi/" method="post" enctype="multipart/form-data">
+            <label for="pretrained-file">Upload for Pretrained Model:</label>
+            <input type="file" id="pretrained-file" name="file" accept=".midi,.mid">
+            <br><br>
+            <button type="submit">Upload</button>
+        </form>
+    
+        <!-- Form for Magenta's Performance RNN -->
+        <form action="/upload_midi_magenta/" method="post" enctype="multipart/form-data">
+            <label for="magenta-file">Upload for Magenta's Performance RNN:</label>
+            <input type="file" id="magenta-file" name="file" accept=".midi,.mid">
+            <br><br>
+            <button type="submit">Upload</button>
+        </form>
+        
+        <!-- MIDI Selector and Controls -->
+        <div class="midi-selector-container">
+            <div class="midi-selector-row">
+                <label for="midi-selector">Select a MIDI to listen:</label>
+                <select id="midi-selector"></select>
+            </div>
+            <div class="midi-control-row">
+                <button onclick="playSelectedMidi()">Play</button>
+                <button onclick="pauseMidi()">Pause</button>
+                <a href="#" id="download-link" class="button">Download</a>
+            </div>
+        </div>
+        
+    </div>
+    
+    
+    <script>
+        // Fetch MIDI list and populate dropdown on page load
+        window.onload = function() {
+            fetch('/list_midis/')
+            .then(response => response.json())
+            .then(data => {
+                const midiSelector = document.getElementById('midi-selector');
+                data.midi_files.forEach(midi => {
+                    let option = document.createElement("option");
+                    option.value = midi;
+                    option.text = midi;
+                    midiSelector.appendChild(option);
+                });
+            });
+        }
+    
+        function playSelectedMidi() {
+            const midiSelector = document.getElementById('midi-selector');
+            const selectedMidi = midiSelector.value;
+        
+            MIDIjs.play(`/midis/${selectedMidi}`);
+            
+            // Set download link href
+            const downloadLink = document.getElementById('download-link');
+            downloadLink.href = `/midis/${selectedMidi}`;
+        }
+    
+        function pauseMidi() {
+            MIDIjs.pause();
+        }
+    </script>
+    
+</body>
+
+</html>
