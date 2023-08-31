@@ -1,6 +1,3 @@
-# improved-music-nn
-improved on the previous music nn with a newer version that comes with a website and a tensorflow pretrained generation option
-
 MIDI Processor Web Application
 
 Project Description
